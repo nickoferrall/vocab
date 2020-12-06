@@ -38,31 +38,35 @@ const Card = styled('div')<{isVisible: boolean}>(({isVisible}) => ({
   }
 }))
 
-const Title = styled('h1')({
+const Title = styled('h1')<{isVisible: boolean}>(({isVisible}) => ({
+  display: isVisible ? 'flex' : 'none',
   textAlign: 'center',
   fontSize: 32,
   color: '#FFFF',
   fontFamily:
     "-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif",
   maxWidth: 240
-})
+}))
 
 const initialCard = deck[Math.floor(Math.random() * deck.length)]
 
+interface Animation {
+  opacity: number
+  transition: string
+}
+
 function App() {
   const [isFlipped, setIsFlipped] = useState(false)
+  const [showTitle, setShowTitle] = useState(true)
   const [card, setCard] = useState(initialCard)
   const {transform, opacity} = useSpring({
     opacity: isFlipped ? 1 : 0,
     transform: `perspective(600px) rotateX(${isFlipped ? 180 : 0}deg)`,
-    config: {mass: 5, tension: 500, friction: 80}
-  })
-  const fade = useSpring({
-    from: {
-      color: 'red'
-    },
-    to: {
-      color: 'green'
+    config: {mass: 5, tension: 500, friction: 80},
+    onFrame: (animatiom: Animation) => {
+      if (animatiom.opacity.toFixed(1) === '0.5') {
+        setShowTitle(true)
+      }
     }
   })
 
@@ -74,6 +78,7 @@ function App() {
   }, [isFlipped])
 
   const toggleisFlipped = () => {
+    setShowTitle(false)
     setIsFlipped(!isFlipped)
   }
 
@@ -87,9 +92,7 @@ function App() {
         }}
       >
         <Card onClick={toggleisFlipped} isVisible={!isFlipped}>
-          <a.div style={fade}>
-            <Title>{card.textOne}</Title>
-          </a.div>
+          <Title isVisible={showTitle}>{card.textOne}</Title>
         </Card>
       </a.div>
       <a.div
@@ -100,9 +103,7 @@ function App() {
         }}
       >
         <Card onClick={toggleisFlipped} isVisible={isFlipped}>
-          <a.div style={fade}>
-            <Title>{card.textTwo}</Title>
-          </a.div>
+          <Title isVisible={showTitle}>{card.textTwo}</Title>
         </Card>
       </a.div>
     </Wrapper>
