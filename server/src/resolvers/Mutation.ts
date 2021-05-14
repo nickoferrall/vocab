@@ -7,6 +7,7 @@ const Mutation = {
     })
     return newUser
   },
+  
   createPoll: async (_parent, args, {prisma}, _info) => {
     const {description, id, options} = args
     const newPoll = await prisma.poll.create({
